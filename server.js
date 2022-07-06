@@ -3,6 +3,8 @@ const cors = require("cors");
 //const config = require("config");
 const path = require("path");
 const db = require("./database");
+const cron = require("node-cron");
+import { fetch_cpalead, fetch_kiwi } from "./fetchOffers";
 
 const app = express();
 
@@ -36,6 +38,9 @@ app.get(["/app", "/app/*"], function (req, res, next) {
   res.sendFile(path.join(__dirname, "app", "index.html"));
   //console.log("check");
 });
+
+cron.schedule("* * * * *", fetch_cpalead);
+cron.schedule("* * * * *", fetch_kiwi);
 
 const port = process.env.PORT || 5000;
 

@@ -16,41 +16,43 @@ const Offer = db.define(
       allowNull: false,
       // allowNull defaults to true
     },
-    name: {
+    title: {
       type: DataTypes.STRING,
       allowNull: false,
       // allowNull defaults to true
     },
-    notificationToken: {
+    description: {
       type: DataTypes.STRING,
       allowNull: false,
       // allowNull defaults to true
     },
-    profileImg: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      // allowNull defaults to true
-    },
-
-    email: {
+    country: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
       // allowNull defaults to true
     },
-    password: {
+    os: {
       type: DataTypes.STRING,
       allowNull: false,
-
       // allowNull defaults to true
     },
-
-    register_date: {
-      type: DataTypes.DATE,
-      defaultValue: Date.now,
+    category: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      // allowNull defaults to true
+    },
+    amount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      // allowNull defaults to true
+    },
+    link: {
+      type: DataTypes.STRING,
+      allowNull: false,
       // allowNull defaults to true
     },
   },
+
   {
     // Other model options go here
     charset: "utf8",
