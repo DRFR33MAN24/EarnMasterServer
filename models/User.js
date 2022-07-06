@@ -26,6 +26,11 @@ const User = db.define(
       allowNull: false,
       // allowNull defaults to true
     },
+    balance: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
     profileImg: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -33,6 +38,18 @@ const User = db.define(
     },
 
     email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      // allowNull defaults to true
+    },
+    paypalMail: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      // allowNull defaults to true
+    },
+    cryptoWallet: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,

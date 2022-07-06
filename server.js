@@ -4,7 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const db = require("./database");
 const cron = require("node-cron");
-import { fetch_cpalead, fetch_kiwi } from "./fetchOffers";
+import { fetch_cpalead, fetch_kiwi } from "./jobs/fetchOffers";
 
 const app = express();
 
@@ -26,6 +26,8 @@ app.use("/api/postback", require("./routes/api/postback"));
 
 app.use("/api/admins", require("./routes/api/admins"));
 app.use("/api/users", require("./routes/api/users"));
+
+app.use("/api/payments", require("./routes/api/payments"));
 
 app.use("/api/authUser", require("./routes/api/authUser"));
 app.use("/api/authAdmin", require("./routes/api/authAdmin"));

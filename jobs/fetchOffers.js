@@ -1,5 +1,5 @@
-const { Offer } = require("./models");
-const { Sequelize } = require("./database");
+const { Offer } = require("../models");
+const { Sequelize } = require("../database");
 const config = require("config");
 const axios = require("axios");
 
@@ -28,4 +28,4 @@ export const fetch_cpalead = async () => {
 
   const update = Offer.insertOrUpdate(offers);
 };
-export const fetch_kiwi = async () => {};
+export const fetch_kiwi = async () => { };
