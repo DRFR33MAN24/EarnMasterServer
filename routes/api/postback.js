@@ -26,6 +26,7 @@ const rewardUser = (userId,offerId,amount)=>{
     const result = await db.transaction(async (t) => {
     user.addOffer(offer);
     user.increment({balance:+amount});
+    //notify user
 
     });
   } catch (error) {
