@@ -13,8 +13,57 @@ const { User } = require("../../models");
 const fs = require("fs");
 const path = require("path");
 const glob = require("glob");
-const { underscoredIf } = require("sequelize/types/utils");
+
 const userFolder = "./users_data";
+
+const { body, checkSchema, validationResult } = require("express-validator");
+const registrationSchema = {
+  username: {
+    custom: {
+      options: (value) => {
+        return User.find({
+          username: value,
+        }).then((user) => {
+          if (user.length > 0) {
+            return Promise.reject("Username already in use");
+          }
+        });
+      },
+    },
+  },
+  gender: {
+    notEmpty: true,
+    errorMessage: "Gender field cannot be empty",
+  },
+  password: {
+    isStrongPassword: {
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+    },
+    errorMessage:
+      "Password must be greater than 8 and contain at least one uppercase letter, one lowercase letter, and one number",
+  },
+  phone: {
+    notEmpty: true,
+    errorMessage: "Phone number cannot be empty",
+  },
+  email: {
+    normalizeEmail: true,
+    custom: {
+      options: (value) => {
+        return User.find({
+          email: value,
+        }).then((user) => {
+          if (user.length > 0) {
+            return Promise.reject("Email address already taken");
+          }
+        });
+      },
+    },
+  },
+};
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const profilePath = `${userFolder}/${req.user.id}`;
@@ -45,10 +94,19 @@ const upload = multer({ storage: storage });
 // @route POST api/auth
 // @desc Auth the user
 // @acces Public
-router.post("/", async (req, res) => {
+router.post("/", checkSchema(registrationSchema), async (req, res) => {
   const { email, password, deviceToken } = req.body;
 
   console.log(req.body);
+
+  // Validate incoming input
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      errors: errors.array(),
+    });
+  }
 
   // Verify URL
   // const query = stringify({
@@ -158,7 +216,7 @@ router.post("/register", async (req, res) => {
     phone: `${email}`,
     password: `${password}`,
     active: `${active}`,
-    deviceToken: deviceToken
+    deviceToken: deviceToken,
   });
 
   // Create salt and hash
