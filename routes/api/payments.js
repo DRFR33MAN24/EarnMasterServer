@@ -64,17 +64,10 @@ export const paypalPayment = (amount) => {
 router.get("/paypal_success", (req, res) => {
   const payerId = req.query.PayerID;
   const paymentId = req.query.paymentId;
-
+  const transactions = req.query.transactions
   const execute_payment_json = {
     payer_id: payerId,
-    transactions: [
-      {
-        amount: {
-          currency: "USD",
-          total: "25.00",
-        },
-      },
-    ],
+    transactions: transactions
   };
 
   try {
