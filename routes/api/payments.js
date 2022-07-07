@@ -12,7 +12,7 @@ paypal.configure({
   client_secret: "EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM",
 });
 
-export const paypalPayment = (amount) => {
+export const paypalPayment = (amount, userId) => {
 
   let create_payment_json = {
     intent: "sale",
@@ -20,7 +20,7 @@ export const paypalPayment = (amount) => {
       payment_method: "paypal",
     },
     redirect_urls: {
-      return_url: "http://localhost:3000/success",
+      return_url: `http://localhost:3000/success?userId=${userId}&total=${amount}$currency=${"USD"}`,
       cancel_url: "http://localhost:3000/cancel",
     },
     transactions: [
@@ -64,10 +64,18 @@ export const paypalPayment = (amount) => {
 router.get("/paypal_success", (req, res) => {
   const payerId = req.query.PayerID;
   const paymentId = req.query.paymentId;
-  const transactions = req.query.transactions
+  const total = req.query.total;
+  const userId = req.query.userId;
+  const currency = req.query.currency;
+
   const execute_payment_json = {
     payer_id: payerId,
-    transactions: transactions
+    transactions: [{
+      amount: {
+        currency: currency,
+        total: total
+      }
+    }]
   };
 
   try {
@@ -82,11 +90,11 @@ router.get("/paypal_success", (req, res) => {
           console.log(JSON.stringify(payment));
           // create a payment order and decrease user balance
           const result = await db.transaction(async (t) => {
-            const user = await User.findOne({ where: { mail: mail } });
-            user.increment({ balance: +amount });
+            const user = await User.findByPk(userId);
+            user.increment({ balance: +total });
             const payment = await PaymentOrder.create({
               type: type,
-              amount: amount,
+              amount: total,
               status: "complete",
             });
             user.addPaymentOrder(payment);
