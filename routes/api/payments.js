@@ -8,8 +8,8 @@ const paypal = require("paypal-rest-sdk");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
-  client_id: "EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM",
-  client_secret: "EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM",
+  client_id: config.get('paypalClientId'),
+  client_secret: config.get('paypalSecret'),
 });
 
 export const paypalPayment = (amount, userId) => {
@@ -20,8 +20,8 @@ export const paypalPayment = (amount, userId) => {
       payment_method: "paypal",
     },
     redirect_urls: {
-      return_url: `http://localhost:3000/success?userId=${userId}&total=${amount}$currency=${"USD"}`,
-      cancel_url: "http://localhost:3000/cancel",
+      return_url: `${config.get('serverUrl')}/paypal_success?userId=${userId}&total=${amount}$currency=${"USD"}`,
+      cancel_url: `${config.get('serverUrl')}/paypal_cancel`,
     },
     transactions: [
       {
@@ -90,6 +90,7 @@ router.get("/paypal_success", (req, res) => {
           console.log(JSON.stringify(payment));
           // create a payment order and decrease user balance
           const result = await db.transaction(async (t) => {
+            
             const user = await User.findByPk(userId);
             user.increment({ balance: +total });
             const payment = await PaymentOrder.create({

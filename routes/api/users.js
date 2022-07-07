@@ -11,7 +11,7 @@ const auth = require("../../middleware/auth");
 const { User, PaymentOrder } = require("../../models");
 const { parseQuery, saveProfileImage } = require("../../utility");
 const db = require("../../database");
-const { paypalPayment } = require('./payments');
+const { paypalPayment } = require("./payments");
 
 router.post("/withdraw", auth, async (req, res) => {
   const { type, amount } = req.body;
@@ -31,7 +31,6 @@ router.post("/withdraw", auth, async (req, res) => {
 
     // create a payment order and decrease user balance
     const result = await db.transaction(async (t) => {
-
       user.increment({ balance: -amount });
       const payment = await PaymentOrder.create({
         type: type,
@@ -59,12 +58,11 @@ router.post("/buy", auth, async (req, res) => {
       return res.json({ status: 400 });
     }
 
-    const paymentUrl = paypalPayment(amount);
+    const paymentUrl = paypalPayment(amount, userId);
     if (!paymentUrl) {
       return res.json({ status: 400 });
     }
     res.json({ url: paymentUrl });
-
   } catch (error) {
     console.log(error);
     return res.status(400);

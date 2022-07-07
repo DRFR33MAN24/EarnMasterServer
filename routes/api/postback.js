@@ -6,13 +6,62 @@ const { User, Offer } = require("../../models");
 const db = require('../../database');
 
 
-router.post("/cpalead", async (req, res) => {
-  console.log(req.body);
+router.get("/cpalead", async (req, res) => {
+  const { password, subid, payout, title,offerId } = req.query;
+  if (password !== config.get('cpalead_password')) {
+    return res.status(400).json({ msg: "wrong password" });
+  }
 
-  rewardUser(userId,offerId,amount);
+
+
+try {
+  
+  rewardUser(subid,offerId,payout);
+  res.status(200).end("1");
+} catch (error) {
+  
+  return res.status(400);
+}
+
+
+
+
+
+
+
+
 });
-router.post("/kiwiwall", async (req, res) => {
-  console.log(req.body);
+router.get("/kiwiwall", async (req, res) => {
+    const {
+      sub_id,
+      amount,
+      status,
+      offer_name,
+      signature,
+      trans_id,
+      offer_id
+    } = req.query;
+    const crypto = require("crypto");
+    const hash = crypto
+    .createHash("md5")
+    .update(`${sub_id}:${amount}:${config.get('kiwi_secret')}`)
+    .digest("hex");
+    
+    if (signature !== hash) {
+      return res.status(400);
+      
+    }
+try {
+  
+  rewardUser(sub_id,offer_id,amount);
+
+  res.status(200).end("1");
+} catch (error) {
+  
+  return res.status(400);
+}
+
+ 
 });
 
 
@@ -31,6 +80,7 @@ const rewardUser = (userId,offerId,amount)=>{
     });
   } catch (error) {
     console.log(error)
+    throw error;
   }
 }
 

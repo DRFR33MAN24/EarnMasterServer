@@ -2,7 +2,11 @@
   "jwtSecret": "sl_myJwtSecret",
   "reCAPTCHA": "6Le54pscAAAAANEv4SCNDdfAPveNBdBBfevtXv4l",
   "verifyURL": "https://google.com/recaptcha/api/siteverify?",
+  "serverUrl": "http://localhost:5000",
+  "paypalClientId": "AXPDEf1JgBZdKpdHEEZkxNRJn_IC5q5ekimHMIhdgXjiCiDcJhPmii_0wkkvfOog5tk15dxCBZTTrDTz",
+  "paypalSecret": "EGYrrmGgjBRTaQIbcX91tjMnXmoP2NDswk20iwM8xUpEAPyX6pUzc3JxOFFKBIOqGsIjpn4aoiiBv-UL",
   "cpaleadAPIKey": "xxx",
+  "cpalead_password": "xxx",
   "kiwiwallAPIKey": "xxx",
   "cpaleadURL": "https://cpalead.com/dashboard/reports/campaign_json.php",
   "kiwiwallURL": "xxx"
