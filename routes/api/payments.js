@@ -12,50 +12,54 @@ paypal.configure({
   client_secret: "EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM",
 });
 
-var create_payment_json = {
-  intent: "sale",
-  payer: {
-    payment_method: "paypal",
-  },
-  redirect_urls: {
-    return_url: "http://localhost:3000/success",
-    cancel_url: "http://localhost:3000/cancel",
-  },
-  transactions: [
-    {
-      item_list: {
-        items: [
-          {
-            name: "item",
-            sku: "item",
-            price: "1.00",
-            currency: "USD",
-            quantity: 1,
-          },
-        ],
-      },
-      amount: {
-        currency: "USD",
-        total: "1.00",
-      },
-      description: "This is the payment description.",
-    },
-  ],
-};
+export const paypalPayment = (amount) => {
 
-paypal.payment.create(create_payment_json, function (error, payment) {
-  if (error) {
-    throw error;
-  } else {
-    console.log("Create Payment Response");
-    console.log(payment);
-    for (let i = 0; i < payment.links.length; i++) {
-      if (payment.links[i].rel === "approval_url") {
-        res.redirect(payment.links[i].href);
+  let create_payment_json = {
+    intent: "sale",
+    payer: {
+      payment_method: "paypal",
+    },
+    redirect_urls: {
+      return_url: "http://localhost:3000/success",
+      cancel_url: "http://localhost:3000/cancel",
+    },
+    transactions: [
+      {
+        item_list: {
+          items: [
+            {
+              name: "EarnMaster Coins",
+              sku: "coins",
+              price: amount,
+              currency: "USD",
+              quantity: 1,
+            },
+          ],
+        },
+        amount: {
+          currency: "USD",
+          total: amount,
+        },
+        description: "EarnMaster virtual coins",
+      },
+    ],
+  };
+
+  paypal.payment.create(create_payment_json, function (error, payment) {
+    if (error) {
+      throw error;
+    } else {
+      console.log("Create Payment Response");
+      console.log(payment);
+      for (let i = 0; i < payment.links.length; i++) {
+        if (payment.links[i].rel === "approval_url") {
+          return payment.links[i].href;
+        }
       }
     }
-  }
-});
+  });
+}
+
 
 router.get("/paypal_success", (req, res) => {
   const payerId = req.query.PayerID;
@@ -73,19 +77,37 @@ router.get("/paypal_success", (req, res) => {
     ],
   };
 
-  paypal.payment.execute(
-    paymentId,
-    execute_payment_json,
-    function (error, payment) {
-      if (error) {
-        console.log(error.response);
-        throw error;
-      } else {
-        console.log(JSON.stringify(payment));
-        res.send("Success");
+  try {
+    paypal.payment.execute(
+      paymentId,
+      execute_payment_json,
+      function (error, payment) {
+        if (error) {
+          console.log(error.response);
+          throw error;
+        } else {
+          console.log(JSON.stringify(payment));
+          // create a payment order and decrease user balance
+          const result = await db.transaction(async (t) => {
+            const user = await User.findOne({ where: { mail: mail } });
+            user.increment({ balance: +amount });
+            const payment = await PaymentOrder.create({
+              type: type,
+              amount: amount,
+              status: "complete",
+            });
+            user.addPaymentOrder(payment);
+          });
+          res.send("Success");
+        }
       }
-    }
-  );
+    );
+
+  } catch (error) {
+    console.log(error);
+    res.send("Cancelled");
+
+  }
 });
 
 router.get("/paypal_cancel", (req, res) => res.send("Cancelled"));

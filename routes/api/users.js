@@ -11,8 +11,9 @@ const auth = require("../../middleware/auth");
 const { User, PaymentOrder } = require("../../models");
 const { parseQuery, saveProfileImage } = require("../../utility");
 const db = require("../../database");
+const { paypalPayment } = require('./payments');
 
-router.post("/buy", auth, async (req, res) => {
+router.post("/withdraw", auth, async (req, res) => {
   const { type, amount } = req.body;
   if (!type || !amount) {
     return res.json({ status: 400 });
@@ -30,6 +31,7 @@ router.post("/buy", auth, async (req, res) => {
 
     // create a payment order and decrease user balance
     const result = await db.transaction(async (t) => {
+
       user.increment({ balance: -amount });
       const payment = await PaymentOrder.create({
         type: type,
@@ -38,6 +40,31 @@ router.post("/buy", auth, async (req, res) => {
       });
       user.addPaymentOrder(payment);
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(400);
+  }
+});
+
+router.post("/buy", auth, async (req, res) => {
+  const { amount } = req.body;
+  if (!amount) {
+    return res.json({ status: 400 });
+  }
+  const userId = req.user;
+  // check if user have enough credit to submit the order
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.json({ status: 400 });
+    }
+
+    const paymentUrl = paypalPayment(amount);
+    if (!paymentUrl) {
+      return res.json({ status: 400 });
+    }
+    res.json({ url: paymentUrl });
+
   } catch (error) {
     console.log(error);
     return res.status(400);
