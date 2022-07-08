@@ -21,6 +21,11 @@ const User = db.define(
       allowNull: false,
       // allowNull defaults to true
     },
+    country: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      // allowNull defaults to true
+    },
     notificationToken: {
       type: DataTypes.STRING,
       allowNull: false,

@@ -150,7 +150,7 @@ router.post("/", checkSchema(registrationSchema), async (req, res) => {
         .json({ msg: "Invalid credentials", status: "ERR" });
 
     jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user.id, email: user.email, country: user.country },
       config.get("jwtSecret"),
       {
         expiresIn: 604800,
@@ -213,10 +213,12 @@ router.post("/register", async (req, res) => {
   // });
   const newUser = User.build({
     name: `${name}`,
-    phone: `${email}`,
+    email: `${email}`,
     password: `${password}`,
     active: `${active}`,
-    deviceToken: deviceToken,
+    notificationToken: deviceToken,
+    country: country,
+
   });
 
   // Create salt and hash
@@ -227,7 +229,7 @@ router.post("/register", async (req, res) => {
       newUser.password = hash;
       newUser.save().then((user) => {
         jwt.sign(
-          { id: user.id },
+          { id: user.id, email: user.email, country: user.country },
           config.get("jwtSecret"),
           {
             expiresIn: 604800,
