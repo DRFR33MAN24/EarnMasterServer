@@ -17,6 +17,7 @@ const glob = require("glob");
 const userFolder = "./users_data";
 
 const { body, checkSchema, validationResult } = require("express-validator");
+const { default: axios } = require("axios");
 const registrationSchema = {
   username: {
     custom: {
@@ -127,51 +128,114 @@ router.post("/", checkSchema(registrationSchema), async (req, res) => {
       .status(400)
       .json({ msg: "Please enter all fields", status: "ERR" });
   }
+  try {
 
-  let user = await User.findOne({ where: { email: email } }, { plain: true });
-  if (!user) {
-    return res
-      .status(400)
-      .json({ msg: "User Does not exists.", status: "ERR" });
-  }
-  if (user.active === false) {
-    return res
-      .status(400)
-      .json({ msg: "Please activate your account", status: "ERR" });
-  }
+    let user = await User.findOne({ where: { email: email } }, { plain: true });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ msg: "User Does not exists.", status: "ERR" });
+    }
+    if (user.active === false) {
+      return res
+        .status(400)
+        .json({ msg: "Please activate your account", status: "ERR" });
+    }
 
-  await user.update({ deviceToken: deviceToken });
+    await user.update({ deviceToken: deviceToken });
 
-  // Validate password
-  bcryptjs.compare(password, user.password).then((isMatch) => {
+    // Validate password
+    const isMatch = await bcryptjs.compare(password, user.password);
     if (!isMatch)
       return res
         .status(400)
         .json({ msg: "Invalid credentials", status: "ERR" });
-
-    jwt.sign(
+    const token = jwt.sign(
       { id: user.id, email: user.email, country: user.country },
       config.get("jwtSecret"),
       {
         expiresIn: 604800,
+      });
+
+    return res.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+
+        email: user.email,
+
+        password: user.password,
       },
-      (err, token) => {
-        if (err) throw err;
-        res.json({
-          token,
-          user: {
-            id: user.id,
-            name: user.name,
+    });
 
-            email: user.email,
+  } catch (error) {
 
-            password: user.password,
-          },
-        });
-      }
-    );
-  });
+  }
 });
+
+router.post('/googleSignIn', async (req, res) => {
+  const { tokenId, deviceToken } = req.body;
+
+  if (!tokenId) {
+    return res.status(400).json({ msg: "Bad token" });
+  }
+  try {
+    const userInfo = await axios.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${tokenId}`);
+    // Check for exitsting user
+    let user = await User.findOne(
+      { where: { email: `${userInfo.email}` } },
+      { plain: true }
+    );
+    if (user) {
+      const token = jwt.sign({ id: user.id, email: user.email, country: user.country }, config.get("jwtSecret"),
+        {
+          expiresIn: 604800,
+        });
+
+      return res.json({
+        token,
+        user: {
+          id: user.id,
+          name: user.name,
+          phone: user.phone,
+          active: user.active,
+        },
+      });
+    }
+
+    const newUser = User.build({
+      name: `${userInfo.name}`,
+      email: `${userInfo.email}`,
+      country: userInfo.country,
+      active: `${true}`,
+      notificationToken: deviceToken,
+
+
+    });
+
+
+    const user = await newUser.save();
+    const token = jwt.sign({ id: user.id, email: user.email, country: user.country }, config.get("jwtSecret"),
+      {
+        expiresIn: 604800,
+      });
+
+    return res.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        active: user.active,
+      },
+    });
+
+
+  } catch (error) {
+
+  }
+})
 
 // @route POST api/users
 // @desc Register New User
@@ -196,60 +260,55 @@ router.post("/register", async (req, res) => {
   if (!name || !email || !password) {
     return res.status(400).json({ msg: "Please enter all fields" });
   }
+  try {
+    // Check for exitsting user
+    let user = await User.findOne(
+      { where: { email: `${email}` } },
+      { plain: true }
+    );
+    if (user) {
+      return res.status(400).json({ msg: "User alerady exists." });
+    }
 
-  // Check for exitsting user
-  let user = await User.findOne(
-    { where: { email: `${email}` } },
-    { plain: true }
-  );
-  if (user) {
-    return res.status(400).json({ msg: "User alerady exists." });
-  }
+    // const newUser = new User({
+    //   name,
+    //   email,
+    //   password
+    // });
+    const newUser = User.build({
+      name: `${name}`,
+      email: `${email}`,
+      password: `${password}`,
+      active: `${active}`,
+      notificationToken: deviceToken,
+      country: country,
 
-  // const newUser = new User({
-  //   name,
-  //   email,
-  //   password
-  // });
-  const newUser = User.build({
-    name: `${name}`,
-    email: `${email}`,
-    password: `${password}`,
-    active: `${active}`,
-    notificationToken: deviceToken,
-    country: country,
-
-  });
-
-  // Create salt and hash
-
-  bcryptjs.genSalt(10, (err, salt) => {
-    bcryptjs.hash(newUser.password, salt, (err, hash) => {
-      if (err) throw err;
-      newUser.password = hash;
-      newUser.save().then((user) => {
-        jwt.sign(
-          { id: user.id, email: user.email, country: user.country },
-          config.get("jwtSecret"),
-          {
-            expiresIn: 604800,
-          },
-          (err, token) => {
-            if (err) throw err;
-            res.json({
-              token,
-              user: {
-                id: user.id,
-                name: user.name,
-                phone: user.phone,
-                active: user.active,
-              },
-            });
-          }
-        );
-      });
     });
-  });
+
+    // Create salt and hash
+    const salt = await bcryptjs.genSalt(10);
+    const hash = await bcryptjs.hash(newUser.password, salt);
+    newUser.password = hash;
+    const user = await newUser.save();
+    const token = jwt.sign({ id: user.id, email: user.email, country: user.country }, config.get("jwtSecret"),
+      {
+        expiresIn: 604800,
+      });
+
+    return res.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        active: user.active,
+      },
+    });
+
+
+  } catch (error) {
+
+  }
 });
 
 router.get("/img", auth, async (req, res) => {
