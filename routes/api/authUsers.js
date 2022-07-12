@@ -95,7 +95,7 @@ const upload = multer({ storage: storage });
 // @route POST api/auth
 // @desc Auth the user
 // @acces Public
-router.post("/", checkSchema(registrationSchema), async (req, res) => {
+router.post("/login", checkSchema(registrationSchema), async (req, res) => {
   const { email, password, deviceToken } = req.body;
 
   console.log(req.body);
@@ -171,7 +171,7 @@ router.post("/", checkSchema(registrationSchema), async (req, res) => {
   } catch (error) {}
 });
 
-router.post("/googleSignIn", async (req, res) => {
+router.post("/loginGoogle", async (req, res) => {
   const { tokenId, deviceToken } = req.body;
 
   if (!tokenId) {

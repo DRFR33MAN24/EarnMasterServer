@@ -8,7 +8,7 @@ const config = require("config");
 const auth = require("../../middleware/auth");
 
 const { Offer } = require("../../models");
-router.get("/", auth, async (req, res) => {
+router.get("/getOffers", auth, async (req, res) => {
   const { offset, country } = req.query;
   const offers = await Offer.findAndCountAll({
     where: { country: country },
