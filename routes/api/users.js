@@ -13,7 +13,6 @@ const { parseQuery, saveProfileImage } = require("../../utility");
 const db = require("../../database");
 const { paypalPayment } = require("./payments");
 
-
 router.post("/withdraw", auth, async (req, res) => {
   const { type, amount } = req.body;
   if (!type || !amount) {
@@ -70,7 +69,7 @@ router.post("/buy", auth, async (req, res) => {
   }
 });
 
-router.get('/offers', auth, async (req, res) => {
+router.get("/offers", auth, async (req, res) => {
   const { offset } = req.query;
   const country = req.user.country;
 
@@ -78,17 +77,18 @@ router.get('/offers', auth, async (req, res) => {
     return res.status(400);
   }
   try {
-
-    const offers = await Offer.findAndCountAll({ where: { country: country }, limit: config.get('offers_fetch_limit'), offset: offset });
+    const offers = await Offer.findAndCountAll({
+      where: { country: country },
+      limit: config.get("offers_fetch_limit"),
+      offset: offset,
+    });
     return res.status(200).json(offers);
   } catch (error) {
     console.log(error);
     return res.status(500);
   }
-
-
 });
-router.get('/notifications', auth, async (req, res) => {
+router.get("/notifications", auth, async (req, res) => {
   const { offset } = req.query;
   const id = req.user.id;
 
@@ -98,22 +98,19 @@ router.get('/notifications', auth, async (req, res) => {
   try {
     const user = await User.findByPk(id);
 
-
     const notifications = await user.getNotifications({
-      limit: config.get('notification_fetch_limit'), offset: offset, order: [
-        ['created_at', 'DESC'],
-      ]
+      limit: config.get("notification_fetch_limit"),
+      offset: offset,
+      order: [["created_at", "DESC"]],
     });
     return res.status(200).json(notifications);
   } catch (error) {
     console.log(error);
     return res.status(500);
   }
-
-
 });
 
-router.get('/activity', auth, async (req, res) => {
+router.get("/activity", auth, async (req, res) => {
   const { offset } = req.query;
   const id = req.user.id;
 
@@ -123,21 +120,18 @@ router.get('/activity', auth, async (req, res) => {
   try {
     const user = await User.findByPk(id);
 
-
     const activities = await user.getOffers({
-      limit: config.get('activity_fetch_limit'), offset: offset, order: [
-        ['created_at', 'DESC'],
-      ]
+      limit: config.get("activity_fetch_limit"),
+      offset: offset,
+      order: [["created_at", "DESC"]],
     });
     return res.status(200).json(activities);
   } catch (error) {
     console.log(error);
     return res.status(500);
   }
-
-
-})
-router.get('/transactions', auth, async (req, res) => {
+});
+router.get("/transactions", auth, async (req, res) => {
   const { offset } = req.query;
   const id = req.user.id;
 
@@ -147,20 +141,17 @@ router.get('/transactions', auth, async (req, res) => {
   try {
     const user = await User.findByPk(id);
 
-
     const transactions = await user.getPaymentOrders({
-      limit: config.get('payments_fetch_limit'), offset: offset, order: [
-        ['created_at', 'DESC'],
-      ]
+      limit: config.get("payments_fetch_limit"),
+      offset: offset,
+      order: [["created_at", "DESC"]],
     });
     return res.status(200).json(transactions);
   } catch (error) {
     console.log(error);
     return res.status(500);
   }
-
-
-})
+});
 
 // router.get("/", auth, async (req, res) => {
 //   if (!req.query) {

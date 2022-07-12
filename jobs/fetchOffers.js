@@ -3,7 +3,7 @@ const { Sequelize } = require("../database");
 const config = require("config");
 const axios = require("axios");
 
-export const fetch_cpalead = async () => {
+const fetch_cpalead = async () => {
   const apiKey = config.get("cpaleadAPIKey");
   const url = config.get("cpaleadURL");
 
@@ -28,4 +28,5 @@ export const fetch_cpalead = async () => {
 
   const update = Offer.insertOrUpdate(offers);
 };
-export const fetch_kiwi = async () => { };
+const fetch_kiwi = async () => {};
+module.exports = { fetch_cpalead, fetch_kiwi };

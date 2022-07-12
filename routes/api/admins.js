@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 //const axios = require("axios");
 
-const auth = require("../../middleware/authUserMiddleware");
+const auth = require("../../middleware/auth");
 // User Model
 const User = require("../../models");
 const { parseQuery } = require("../../utility");

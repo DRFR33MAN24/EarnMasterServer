@@ -129,7 +129,6 @@ router.post("/", checkSchema(registrationSchema), async (req, res) => {
       .json({ msg: "Please enter all fields", status: "ERR" });
   }
   try {
-
     let user = await User.findOne({ where: { email: email } }, { plain: true });
     if (!user) {
       return res
@@ -155,7 +154,8 @@ router.post("/", checkSchema(registrationSchema), async (req, res) => {
       config.get("jwtSecret"),
       {
         expiresIn: 604800,
-      });
+      }
+    );
 
     return res.json({
       token,
@@ -168,30 +168,32 @@ router.post("/", checkSchema(registrationSchema), async (req, res) => {
         password: user.password,
       },
     });
-
-  } catch (error) {
-
-  }
+  } catch (error) {}
 });
 
-router.post('/googleSignIn', async (req, res) => {
+router.post("/googleSignIn", async (req, res) => {
   const { tokenId, deviceToken } = req.body;
 
   if (!tokenId) {
     return res.status(400).json({ msg: "Bad token" });
   }
   try {
-    const userInfo = await axios.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${tokenId}`);
+    const userInfo = await axios.get(
+      `https://oauth2.googleapis.com/tokeninfo?id_token=${tokenId}`
+    );
     // Check for exitsting user
     let user = await User.findOne(
       { where: { email: `${userInfo.email}` } },
       { plain: true }
     );
     if (user) {
-      const token = jwt.sign({ id: user.id, email: user.email, country: user.country }, config.get("jwtSecret"),
+      const token = jwt.sign(
+        { id: user.id, email: user.email, country: user.country },
+        config.get("jwtSecret"),
         {
           expiresIn: 604800,
-        });
+        }
+      );
 
       return res.json({
         token,
@@ -204,38 +206,34 @@ router.post('/googleSignIn', async (req, res) => {
       });
     }
 
-    const newUser = User.build({
+    let newUser = User.build({
       name: `${userInfo.name}`,
       email: `${userInfo.email}`,
       country: userInfo.country,
       active: `${true}`,
       notificationToken: deviceToken,
-
-
     });
 
-
-    const user = await newUser.save();
-    const token = jwt.sign({ id: user.id, email: user.email, country: user.country }, config.get("jwtSecret"),
+    newUser = await newUser.save();
+    const token = jwt.sign(
+      { id: newUser.id, email: newUser.email, country: newUser.country },
+      config.get("jwtSecret"),
       {
         expiresIn: 604800,
-      });
+      }
+    );
 
     return res.json({
       token,
       user: {
-        id: user.id,
-        name: user.name,
-        phone: user.phone,
-        active: user.active,
+        id: newUser.id,
+        name: newUser.name,
+        phone: newUser.phone,
+        active: newUser.active,
       },
     });
-
-
-  } catch (error) {
-
-  }
-})
+  } catch (error) {}
+});
 
 // @route POST api/users
 // @desc Register New User
@@ -275,40 +273,38 @@ router.post("/register", async (req, res) => {
     //   email,
     //   password
     // });
-    const newUser = User.build({
+    let newUser = User.build({
       name: `${name}`,
       email: `${email}`,
       password: `${password}`,
       active: `${active}`,
       notificationToken: deviceToken,
       country: country,
-
     });
 
     // Create salt and hash
     const salt = await bcryptjs.genSalt(10);
     const hash = await bcryptjs.hash(newUser.password, salt);
     newUser.password = hash;
-    const user = await newUser.save();
-    const token = jwt.sign({ id: user.id, email: user.email, country: user.country }, config.get("jwtSecret"),
+    newUser = await newUser.save();
+    const token = jwt.sign(
+      { id: newUser.id, email: newUser.email, country: newUser.country },
+      config.get("jwtSecret"),
       {
         expiresIn: 604800,
-      });
+      }
+    );
 
     return res.json({
       token,
       user: {
-        id: user.id,
-        name: user.name,
-        phone: user.phone,
-        active: user.active,
+        id: newUser.id,
+        name: newUser.name,
+        phone: newUser.phone,
+        active: newUser.active,
       },
     });
-
-
-  } catch (error) {
-
-  }
+  } catch (error) {}
 });
 
 router.get("/img", auth, async (req, res) => {

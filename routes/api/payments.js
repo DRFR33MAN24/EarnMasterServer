@@ -8,20 +8,21 @@ const paypal = require("paypal-rest-sdk");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
-  client_id: config.get('paypalClientId'),
-  client_secret: config.get('paypalSecret'),
+  client_id: config.get("paypalClientId"),
+  client_secret: config.get("paypalSecret"),
 });
 
-export const paypalPayment = (amount, userId) => {
-
+const paypalPayment = (amount, userId) => {
   let create_payment_json = {
     intent: "sale",
     payer: {
       payment_method: "paypal",
     },
     redirect_urls: {
-      return_url: `${config.get('serverUrl')}/paypal_success?userId=${userId}&total=${amount}$currency=${"USD"}`,
-      cancel_url: `${config.get('serverUrl')}/paypal_cancel`,
+      return_url: `${config.get(
+        "serverUrl"
+      )}/paypal_success?userId=${userId}&total=${amount}$currency=${"USD"}`,
+      cancel_url: `${config.get("serverUrl")}/paypal_cancel`,
     },
     transactions: [
       {
@@ -58,10 +59,9 @@ export const paypalPayment = (amount, userId) => {
       }
     }
   });
-}
+};
 
-
-router.get("/paypal_success", (req, res) => {
+router.get("/paypal_success", async (req, res) => {
   const payerId = req.query.PayerID;
   const paymentId = req.query.paymentId;
   const total = req.query.total;
@@ -70,19 +70,21 @@ router.get("/paypal_success", (req, res) => {
 
   const execute_payment_json = {
     payer_id: payerId,
-    transactions: [{
-      amount: {
-        currency: currency,
-        total: total
-      }
-    }]
+    transactions: [
+      {
+        amount: {
+          currency: currency,
+          total: total,
+        },
+      },
+    ],
   };
 
   try {
     paypal.payment.execute(
       paymentId,
       execute_payment_json,
-      function (error, payment) {
+      async function (error, payment) {
         if (error) {
           console.log(error.response);
           throw error;
@@ -90,7 +92,6 @@ router.get("/paypal_success", (req, res) => {
           console.log(JSON.stringify(payment));
           // create a payment order and decrease user balance
           const result = await db.transaction(async (t) => {
-            
             const user = await User.findByPk(userId);
             user.increment({ balance: +total });
             const payment = await PaymentOrder.create({
@@ -104,12 +105,12 @@ router.get("/paypal_success", (req, res) => {
         }
       }
     );
-
   } catch (error) {
     console.log(error);
     res.send("Cancelled");
-
   }
 });
 
-router.get("/paypal_cancel", (req, res) => res.send("Cancelled"));
+router.get("/paypal_cancel", async (req, res) => res.send("Cancelled"));
+
+module.exports = { paypalPayment, router };
