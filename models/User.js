@@ -23,18 +23,18 @@ const User = db.define(
     },
     country: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       // allowNull defaults to true
     },
     notificationToken: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       // allowNull defaults to true
     },
     balance: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 0
+      defaultValue: 0,
     },
     profileImg: {
       type: DataTypes.STRING,
@@ -50,13 +50,13 @@ const User = db.define(
     },
     paypalMail: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       unique: true,
       // allowNull defaults to true
     },
     cryptoWallet: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       unique: true,
       // allowNull defaults to true
     },

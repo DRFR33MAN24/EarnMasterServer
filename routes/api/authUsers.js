@@ -83,6 +83,7 @@ const loginScheme = {
 
   email: {
     normalizeEmail: true,
+
     custom: {
       options: (value) => {
         return User.find({
@@ -126,19 +127,19 @@ const upload = multer({ storage: storage });
 // @route POST api/auth
 // @desc Auth the user
 // @acces Public
-router.post("/login", checkSchema(registrationSchema), async (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password, deviceToken } = req.body;
 
   console.log(req.body);
 
   // Validate incoming input
-  const errors = validationResult(req);
+  // const errors = validationResult(req);
 
-  if (!errors.isEmpty()) {
-    return res.status(400).json({
-      errors: errors.array(),
-    });
-  }
+  // if (!errors.isEmpty()) {
+  //   return res.status(400).json({
+  //     errors: errors.array(),
+  //   });
+  // }
 
   // Verify URL
   // const query = stringify({
@@ -271,7 +272,7 @@ router.post("/loginGoogle", async (req, res) => {
 // @acces Public
 router.post("/register", async (req, res) => {
   console.log(req.body);
-  const { name, email, password, active, deviceToken } = req.body;
+  const { username, email, password, deviceToken, country } = req.body;
   // Verify URL
   // const query = stringify({
   //   secret: config.get("reCAPTCHA"),
@@ -286,7 +287,7 @@ router.post("/register", async (req, res) => {
   //   return res.status(400).json({ msg: "Failed captcha verification" });
   // }
 
-  if (!name || !email || !password) {
+  if (!username || !email || !password) {
     return res.status(400).json({ msg: "Please enter all fields" });
   }
   try {
@@ -305,10 +306,10 @@ router.post("/register", async (req, res) => {
     //   password
     // });
     let newUser = User.build({
-      name: `${name}`,
+      name: username,
       email: `${email}`,
       password: `${password}`,
-      active: `${active}`,
+      active: false,
       notificationToken: deviceToken,
       country: country,
     });
@@ -335,7 +336,9 @@ router.post("/register", async (req, res) => {
         active: newUser.active,
       },
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 router.get("/img", auth, async (req, res) => {
