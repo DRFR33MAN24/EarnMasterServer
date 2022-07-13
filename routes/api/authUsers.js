@@ -332,7 +332,7 @@ router.post("/register", async (req, res) => {
       user: {
         id: newUser.id,
         name: newUser.name,
-        phone: newUser.phone,
+        email: newUser.email,
         active: newUser.active,
       },
     });
