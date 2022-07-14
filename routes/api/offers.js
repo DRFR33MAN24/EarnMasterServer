@@ -9,11 +9,11 @@ const auth = require("../../middleware/auth");
 
 const { Offer } = require("../../models");
 router.get("/getOffers", auth, async (req, res) => {
-  const { offset, country } = req.query;
+  const { offset } = req.query;
+
   const offers = await Offer.findAndCountAll({
-    where: { country: country },
-    offset: offset,
     limit: 10,
+    offset: parseInt(offset),
   });
   res.json(offers);
 });
