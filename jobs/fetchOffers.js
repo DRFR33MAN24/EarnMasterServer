@@ -8,8 +8,9 @@ const fetch_cpalead = async () => {
   const url = config.get("cpaleadURL");
 
   const response = await axios.get(`${url}?id=${apiKey}`);
-  const cpaOffers = response.offers;
-  const num_offers = response.number_offers;
+
+  const cpaOffers = response.data.offers;
+  const num_offers = response.data.number_offers;
 
   let offers = [];
   cpaOffers.map((offer) => {
@@ -26,7 +27,7 @@ const fetch_cpalead = async () => {
     });
   });
 
-  const update = Offer.insertOrUpdate(offers);
+  const update = Offer.bulkCreate(offers);
 };
 const fetch_kiwi = async () => {};
 module.exports = { fetch_cpalead, fetch_kiwi };

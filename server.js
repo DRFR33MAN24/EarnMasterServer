@@ -42,8 +42,12 @@ app.get(["/app", "/app/*"], function (req, res, next) {
   //console.log("check");
 });
 
-cron.schedule("* * * * *", fetch_cpalead);
-cron.schedule("* * * * *", fetch_kiwi);
+// (async function () {
+//   await fetch_cpalead();
+// })();
+
+// cron.schedule("* * * * *", fetch_cpalead);
+// cron.schedule("* * * * *", fetch_kiwi);
 
 const port = process.env.PORT || 5000;
 
