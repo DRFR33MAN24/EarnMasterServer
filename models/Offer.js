@@ -51,6 +51,23 @@ const Offer = db.define(
       allowNull: false,
       // allowNull defaults to true
     },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      // allowNull defaults to true
+    },
+    timeToComplete: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: "10 min",
+      // allowNull defaults to true
+    },
+    animated: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      // allowNull defaults to true
+    },
   },
 
   {
