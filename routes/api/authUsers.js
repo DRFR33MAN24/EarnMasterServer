@@ -198,6 +198,7 @@ router.post("/login", async (req, res) => {
         email: user.email,
 
         password: user.password,
+        balance: user.balance,
       },
     });
   } catch (error) {}
@@ -262,6 +263,7 @@ router.post("/loginGoogle", async (req, res) => {
         name: newUser.name,
         phone: newUser.phone,
         active: newUser.active,
+        balance: newUser.balance,
       },
     });
   } catch (error) {}
@@ -334,6 +336,7 @@ router.post("/register", async (req, res) => {
         name: newUser.name,
         email: newUser.email,
         active: newUser.active,
+        balance: newUser.balance,
       },
     });
   } catch (error) {

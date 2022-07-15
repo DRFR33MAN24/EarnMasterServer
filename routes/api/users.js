@@ -91,7 +91,7 @@ router.get("/offers", auth, async (req, res) => {
 router.get("/notifications", auth, async (req, res) => {
   const { offset } = req.query;
   const id = req.user.id;
-  console.log("notifications", id);
+
   if (!offset) {
     return res.status(400);
   }
@@ -101,8 +101,9 @@ router.get("/notifications", auth, async (req, res) => {
     const notifications = await user.getNotifications({
       limit: config.get("notification_fetch_limit"),
       offset: parseInt(offset),
-      order: [["created_at", "DESC"]],
+      order: [["createdAt", "DESC"]],
     });
+
     return res.status(200).json(notifications);
   } catch (error) {
     console.log(error);
