@@ -56,6 +56,11 @@ const Offer = db.define(
       allowNull: false,
       // allowNull defaults to true
     },
+    icon: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      // allowNull defaults to true
+    },
     timeToComplete: {
       type: DataTypes.STRING,
       allowNull: true,

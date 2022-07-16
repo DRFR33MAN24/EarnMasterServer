@@ -15,6 +15,7 @@ const fetch_cpalead = async () => {
   let offers = [];
   cpaOffers.map((offer) => {
     const image = offer.previews[0].url;
+    const icon = offer.creatives[0].url;
 
     offers.push({
       id: offer.campid,
@@ -24,6 +25,7 @@ const fetch_cpalead = async () => {
       amount: offer.amount,
       category: offer.category_name,
       image: image,
+      icon: icon,
     });
   });
 
