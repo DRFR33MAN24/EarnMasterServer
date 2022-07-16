@@ -14,8 +14,8 @@ const db = require("../../database");
 const { paypalPayment } = require("./payments");
 
 router.post("/withdraw", auth, async (req, res) => {
-  const { type, amount } = req.body;
-  if (!type || !amount) {
+  const { name, amount } = req.body;
+  if (!name || !amount) {
     return res.json({ status: 400 });
   }
   const userId = req.user;
@@ -33,7 +33,7 @@ router.post("/withdraw", auth, async (req, res) => {
     const result = await db.transaction(async (t) => {
       user.increment({ balance: -amount });
       const payment = await PaymentOrder.create({
-        type: type,
+        name: name,
         amount: amount,
         status: "pending",
       });
