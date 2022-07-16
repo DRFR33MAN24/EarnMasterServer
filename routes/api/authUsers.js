@@ -203,6 +203,38 @@ router.post("/login", async (req, res) => {
     });
   } catch (error) {}
 });
+router.post("/loadUser", auth, async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.json({ status: 400 });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, country: user.country },
+      config.get("jwtSecret"),
+      {
+        expiresIn: 604800,
+      }
+    );
+
+    return res.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+
+        email: user.email,
+
+        password: user.password,
+        balance: user.balance,
+      },
+    });
+  } catch (error) {}
+});
 
 router.post("/loginGoogle", async (req, res) => {
   const { tokenId, deviceToken } = req.body;

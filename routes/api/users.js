@@ -18,10 +18,12 @@ router.post("/withdraw", auth, async (req, res) => {
   if (!name || !amount) {
     return res.json({ status: 400 });
   }
-  const userId = req.user;
+  const userId = req.user.id;
+
   // check if user have enough credit to submit the order
   try {
-    const user = await User.findById(userId);
+    const user = await User.findByPk(userId);
+
     if (!user) {
       return res.json({ status: 400 });
     }
