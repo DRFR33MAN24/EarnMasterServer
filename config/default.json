@@ -12,6 +12,6 @@
   "kiwiwallURL": "xxx",
   "offers_fetch_limit": 20,
   "notification_fetch_limit": 20,
-  "payment_fetch_limit": 20,
+  "payments_fetch_limit": 20,
   "activity_fetch_limit": 20
 }

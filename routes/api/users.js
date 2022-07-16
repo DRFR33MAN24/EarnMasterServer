@@ -144,8 +144,8 @@ router.get("/transactions", auth, async (req, res) => {
 
     const transactions = await user.getPaymentOrders({
       limit: config.get("payments_fetch_limit"),
-      offset: offset,
-      order: [["created_at", "DESC"]],
+      offset: parseInt(offset),
+      order: [["createdAt", "DESC"]],
     });
     return res.status(200).json(transactions);
   } catch (error) {
