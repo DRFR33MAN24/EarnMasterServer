@@ -173,7 +173,7 @@ router.post("/login", async (req, res) => {
         .json({ msg: "Please activate your account", status: "ERR" });
     }
 
-    await user.update({ deviceToken: deviceToken });
+    await user.update({ notificationToken: deviceToken });
 
     // Validate password
     const isMatch = await bcryptjs.compare(password, user.password);
@@ -205,7 +205,7 @@ router.post("/login", async (req, res) => {
 });
 router.post("/loadUser", auth, async (req, res) => {
   const userId = req.user.id;
-
+  const { deviceToken } = req.body;
   try {
     const user = await User.findByPk(userId);
 
@@ -220,7 +220,7 @@ router.post("/loadUser", auth, async (req, res) => {
         expiresIn: 604800,
       }
     );
-
+    user.update({ notificationToken: deviceToken });
     return res.json({
       token,
       user: {

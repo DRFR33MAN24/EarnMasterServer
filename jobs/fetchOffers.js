@@ -14,8 +14,14 @@ const fetch_cpalead = async () => {
 
   let offers = [];
   cpaOffers.map((offer) => {
-    const image = offer.previews[0].url;
-    const icon = offer.creatives[0].url;
+    let image = "";
+    let icon = "";
+    if (offer.creatives.length !== 0) {
+      icon = offer.creatives[0].url;
+    }
+    if (offer.previews.length !== 0) {
+      image = offer.previews[0].url;
+    }
 
     offers.push({
       id: offer.campid,
@@ -31,5 +37,38 @@ const fetch_cpalead = async () => {
 
   const update = Offer.bulkCreate(offers);
 };
-const fetch_kiwi = async () => {};
+const fetch_kiwi = async () => {
+  const apiKey = config.get("kiwiwallAPIKey");
+  const url = config.get("kiwiwallURL");
+
+  const response = await axios.get(`${url}/${apiKey}/?country=US`);
+
+  const cpaOffers = response.data.offers;
+  const num_offers = response.data.offers.length;
+
+  let offers = [];
+  cpaOffers.map((offer) => {
+    let image = "";
+    let icon = "";
+    if (offer.logo) {
+      icon = offer.logo;
+    }
+    if (offer.logo) {
+      image = offer.logo;
+    }
+
+    offers.push({
+      id: offer.id,
+      title: offer.name,
+      description: offer.instructions,
+      link: offer.link,
+      amount: offer.amount,
+      category: offer.category,
+      image: image,
+      icon: icon,
+    });
+  });
+
+  const update = Offer.bulkCreate(offers);
+};
 module.exports = { fetch_cpalead, fetch_kiwi };

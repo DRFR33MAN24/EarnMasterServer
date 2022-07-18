@@ -43,7 +43,7 @@ app.get(["/app", "/app/*"], function (req, res, next) {
 });
 
 // (async function () {
-//   await fetch_cpalead();
+//   await fetch_kiwi();
 // })();
 
 // cron.schedule("* * * * *", fetch_cpalead);
