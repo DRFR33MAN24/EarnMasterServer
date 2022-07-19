@@ -1,5 +1,7 @@
 const db = require("./../database");
 const { DataTypes } = require("sequelize");
+const { sendEmail } = require("../mail");
+const { notify } = require("../notification");
 
 const User = db.define(
   "User",
@@ -79,5 +81,13 @@ const User = db.define(
     collate: "utf8_unicode_ci",
   }
 );
+User.prototype.sendEmail = function (options, messageDetails) {
+  options.to = this.email;
+  sendEmail(options, messageDetails);
+};
+User.prototype.notify = function (messageDetails) {
+  const options = { token: this.notificationToken };
+  notify(options, messageDetails);
+};
 
 module.exports = User;

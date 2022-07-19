@@ -398,5 +398,17 @@ router.get("/img", auth, async (req, res) => {
 router.post("/idUpload", [auth, upload.single("file")], async (req, res) => {
   res.end("200");
 });
+router.post("/testInstanceMethod", async (req, res) => {
+  try {
+    const user = await User.findByPk(1);
+    user.sendEmail(
+      { provider: "mailgun" },
+      { title: "test msg", body: "hello it's a test message" }
+    );
+    res.end("success");
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 module.exports = router;
