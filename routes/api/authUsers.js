@@ -69,34 +69,7 @@ const registrationSchema = {
     },
   },
 };
-const loginScheme = {
-  password: {
-    isStrongPassword: {
-      minLength: 8,
-      minLowercase: 1,
-      minUppercase: 1,
-      minNumbers: 1,
-    },
-    errorMessage:
-      "Password must be greater than 8 and contain at least one uppercase letter, one lowercase letter, and one number",
-  },
 
-  email: {
-    normalizeEmail: true,
-
-    custom: {
-      options: (value) => {
-        return User.find({
-          email: value,
-        }).then((user) => {
-          if (user.length > 0) {
-            return Promise.reject("Email address already taken");
-          }
-        });
-      },
-    },
-  },
-};
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const profilePath = `${userFolder}/${req.user.id}`;
@@ -124,13 +97,21 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
+
+const validateEmail = (email) => {
+  return email.match(
+    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  );
+};
+
+
 // @route POST api/auth
 // @desc Auth the user
 // @acces Public
 router.post("/login", async (req, res) => {
   const { email, password, deviceToken } = req.body;
 
-  console.log(req.body);
+  //console.log(req.body);
 
   // Validate incoming input
   // const errors = validationResult(req);
@@ -158,19 +139,19 @@ router.post("/login", async (req, res) => {
   if (!email || !password) {
     return res
       .status(400)
-      .json({ msg: "Please enter all fields", status: "ERR" });
+      .json({ msg: "Please enter all fields" });
   }
   try {
     let user = await User.findOne({ where: { email: email } }, { plain: true });
     if (!user) {
       return res
         .status(400)
-        .json({ msg: "User Does not exists.", status: "ERR" });
+        .json({ msg: "User Does not exists." });
     }
     if (user.active === false) {
       return res
         .status(400)
-        .json({ msg: "Please activate your account", status: "ERR" });
+        .json({ msg: "Please activate your account" });
     }
 
     await user.update({ notificationToken: deviceToken });
@@ -180,7 +161,7 @@ router.post("/login", async (req, res) => {
     if (!isMatch)
       return res
         .status(400)
-        .json({ msg: "Invalid credentials", status: "ERR" });
+        .json({ msg: "Invalid credentials" });
     const token = jwt.sign(
       { id: user.id, email: user.email, country: user.country },
       config.get("jwtSecret"),
@@ -199,9 +180,11 @@ router.post("/login", async (req, res) => {
 
         password: user.password,
         balance: user.balance,
+        country: user.country,
+        dob: user.dateOfBirth
       },
     });
-  } catch (error) {}
+  } catch (error) { }
 });
 router.post("/loadUser", auth, async (req, res) => {
   const userId = req.user.id;
@@ -231,9 +214,12 @@ router.post("/loadUser", auth, async (req, res) => {
 
         password: user.password,
         balance: user.balance,
+        dob: user.dateOfBirth,
+        country: user.country
+
       },
     });
-  } catch (error) {}
+  } catch (error) { }
 });
 
 router.post("/loginGoogle", async (req, res) => {
@@ -298,7 +284,7 @@ router.post("/loginGoogle", async (req, res) => {
         balance: newUser.balance,
       },
     });
-  } catch (error) {}
+  } catch (error) { }
 });
 
 // @route POST api/users
@@ -306,7 +292,7 @@ router.post("/loginGoogle", async (req, res) => {
 // @acces Public
 router.post("/register", async (req, res) => {
   console.log(req.body);
-  const { username, email, password, deviceToken, country } = req.body;
+  const { username, email, password, repeat_password, deviceToken, country, dob } = req.body;
   // Verify URL
   // const query = stringify({
   //   secret: config.get("reCAPTCHA"),
@@ -321,8 +307,15 @@ router.post("/register", async (req, res) => {
   //   return res.status(400).json({ msg: "Failed captcha verification" });
   // }
 
-  if (!username || !email || !password) {
+  if (!username || !email || !password || !repeat_password || !dob || !country || !deviceToken) {
     return res.status(400).json({ msg: "Please enter all fields" });
+  }
+
+  if (password !== repeat_password) {
+    return res.status(400).json({ msg: "Passwords dont match" });
+  }
+  if (!validateEmail(email)) {
+    return res.status(400).json({ msg: "Not a valid email address" });
   }
   try {
     // Check for exitsting user
@@ -346,6 +339,7 @@ router.post("/register", async (req, res) => {
       active: false,
       notificationToken: deviceToken,
       country: country,
+      dateOfBirth: dob,
     });
 
     // Create salt and hash
@@ -369,6 +363,8 @@ router.post("/register", async (req, res) => {
         email: newUser.email,
         active: newUser.active,
         balance: newUser.balance,
+        country: newUser.country,
+        dob: newUser.dataOfBirth
       },
     });
   } catch (error) {

@@ -28,6 +28,11 @@ const User = db.define(
       allowNull: true,
       // allowNull defaults to true
     },
+    dateOfBirth: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      // allowNull defaults to true
+    },
     notificationToken: {
       type: DataTypes.STRING,
       allowNull: true,
