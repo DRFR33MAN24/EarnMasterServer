@@ -104,7 +104,6 @@ const validateEmail = (email) => {
   );
 };
 
-
 // @route POST api/auth
 // @desc Auth the user
 // @acces Public
@@ -137,31 +136,22 @@ router.post("/login", async (req, res) => {
   // }
 
   if (!email || !password) {
-    return res
-      .status(400)
-      .json({ msg: "Please enter all fields" });
+    return res.status(400).json({ msg: "Please enter all fields" });
   }
   try {
     let user = await User.findOne({ where: { email: email } }, { plain: true });
     if (!user) {
-      return res
-        .status(400)
-        .json({ msg: "User Does not exists." });
+      return res.status(400).json({ msg: "User Does not exists." });
     }
     if (user.active === false) {
-      return res
-        .status(400)
-        .json({ msg: "Please activate your account" });
+      return res.status(400).json({ msg: "Please activate your account" });
     }
 
     await user.update({ notificationToken: deviceToken });
 
     // Validate password
     const isMatch = await bcryptjs.compare(password, user.password);
-    if (!isMatch)
-      return res
-        .status(400)
-        .json({ msg: "Invalid credentials" });
+    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
     const token = jwt.sign(
       { id: user.id, email: user.email, country: user.country },
       config.get("jwtSecret"),
@@ -181,10 +171,10 @@ router.post("/login", async (req, res) => {
         password: user.password,
         balance: user.balance,
         country: user.country,
-        dob: user.dateOfBirth
+        dob: user.dateOfBirth,
       },
     });
-  } catch (error) { }
+  } catch (error) {}
 });
 router.post("/loadUser", auth, async (req, res) => {
   const userId = req.user.id;
@@ -215,11 +205,10 @@ router.post("/loadUser", auth, async (req, res) => {
         password: user.password,
         balance: user.balance,
         dob: user.dateOfBirth,
-        country: user.country
-
+        country: user.country,
       },
     });
-  } catch (error) { }
+  } catch (error) {}
 });
 
 router.post("/loginGoogle", async (req, res) => {
@@ -284,7 +273,7 @@ router.post("/loginGoogle", async (req, res) => {
         balance: newUser.balance,
       },
     });
-  } catch (error) { }
+  } catch (error) {}
 });
 
 // @route POST api/users
@@ -292,7 +281,15 @@ router.post("/loginGoogle", async (req, res) => {
 // @acces Public
 router.post("/register", async (req, res) => {
   console.log(req.body);
-  const { username, email, password, repeat_password, deviceToken, country, dob } = req.body;
+  const {
+    username,
+    email,
+    password,
+    repeat_password,
+    deviceToken,
+    country,
+    dob,
+  } = req.body;
   // Verify URL
   // const query = stringify({
   //   secret: config.get("reCAPTCHA"),
@@ -307,7 +304,15 @@ router.post("/register", async (req, res) => {
   //   return res.status(400).json({ msg: "Failed captcha verification" });
   // }
 
-  if (!username || !email || !password || !repeat_password || !dob || !country || !deviceToken) {
+  if (
+    !username ||
+    !email ||
+    !password ||
+    !repeat_password ||
+    !dob ||
+    !country ||
+    !deviceToken
+  ) {
     return res.status(400).json({ msg: "Please enter all fields" });
   }
 
@@ -364,7 +369,7 @@ router.post("/register", async (req, res) => {
         active: newUser.active,
         balance: newUser.balance,
         country: newUser.country,
-        dob: newUser.dataOfBirth
+        dob: newUser.dataOfBirth,
       },
     });
   } catch (error) {

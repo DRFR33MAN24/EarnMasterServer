@@ -9,6 +9,7 @@ const notify = async (options, message) => {
   try {
     const { title, body, imageUrl } = message;
     const token = options;
+
     await admin.messaging().sendMulticast({
       token,
       notification: {
