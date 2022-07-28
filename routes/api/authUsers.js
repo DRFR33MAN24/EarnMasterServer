@@ -223,7 +223,12 @@ router.post("/loginGoogle", async (req, res) => {
       `https://oauth2.googleapis.com/tokeninfo?id_token=${tokenId}`
     );
     const userInfoPlus = await axios.get(
-      `https://people.googleapis.com/v1/people/${accessToken}`
+      `https://people.googleapis.com/v1/people/${tokenId}?personFields=genders`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
     );
     console.log(userInfoPlus);
     // Check for exitsting user
