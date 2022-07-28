@@ -212,7 +212,8 @@ router.post("/loadUser", auth, async (req, res) => {
 });
 
 router.post("/loginGoogle", async (req, res) => {
-  const { tokenId, deviceToken } = req.body;
+  const { tokenId, accessToken, deviceToken } = req.body;
+  console.log(req.body);
 
   if (!tokenId) {
     return res.status(400).json({ msg: "Bad token" });
@@ -221,11 +222,16 @@ router.post("/loginGoogle", async (req, res) => {
     const userInfo = await axios.get(
       `https://oauth2.googleapis.com/tokeninfo?id_token=${tokenId}`
     );
+    const userInfoPlus = await axios.get(
+      `https://people.googleapis.com/v1/people/${accessToken}`
+    );
+    console.log(userInfoPlus);
     // Check for exitsting user
     let user = await User.findOne(
-      { where: { email: `${userInfo.email}` } },
+      { where: { email: `${userInfo.data.email}` } },
       { plain: true }
     );
+
     if (user) {
       const token = jwt.sign(
         { id: user.id, email: user.email, country: user.country },
@@ -273,7 +279,9 @@ router.post("/loginGoogle", async (req, res) => {
         balance: newUser.balance,
       },
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 // @route POST api/users
