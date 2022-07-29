@@ -143,6 +143,9 @@ router.post("/login", async (req, res) => {
     if (!user) {
       return res.status(400).json({ msg: "User Does not exists." });
     }
+    if (!user.oauthSignIn === true) {
+      return res.status(400).json({ msg: "Please sign in with Google." });
+    }
     if (user.active === false) {
       return res.status(400).json({ msg: "Please activate your account" });
     }
@@ -168,7 +171,6 @@ router.post("/login", async (req, res) => {
 
         email: user.email,
 
-        password: user.password,
         balance: user.balance,
         country: user.country,
         dob: user.dateOfBirth,
@@ -202,10 +204,10 @@ router.post("/loadUser", auth, async (req, res) => {
 
         email: user.email,
 
-        password: user.password,
         balance: user.balance,
-        dob: user.dateOfBirth,
+        dataOfBirth: user.dateOfBirth,
         country: user.country,
+        profileImg: user.profileImg,
       },
     });
   } catch (error) {}
@@ -213,7 +215,7 @@ router.post("/loadUser", auth, async (req, res) => {
 
 router.post("/loginGoogle", async (req, res) => {
   const { tokenId, accessToken, deviceToken, userId } = req.body;
-  // console.log(req.body);
+  //console.log(req.body);
 
   if (!tokenId) {
     return res.status(400).json({ msg: "Bad token" });
@@ -223,16 +225,16 @@ router.post("/loginGoogle", async (req, res) => {
       `https://oauth2.googleapis.com/tokeninfo?id_token=${tokenId}`
     );
 
-    const userInfoPlus = await axios.get(
-      `https://people.googleapis.com/v1/people/${userId}?personFields=addresses`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    //const userInfoPlus = await axios.get(
+    //   `https://people.googleapis.com/v1/people/${userId}?personFields=addresses`,
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${accessToken}`,
+    //     },
+    //   }
+    // );
     //console.log(userInfoPlus.data.birthdays[0].date);
-    console.log(userInfoPlus.data);
+    //console.log(userInfo.data);
     // Check for exitsting user
     let user = await User.findOne(
       { where: { email: `${userInfo.data.email}` } },
@@ -255,16 +257,22 @@ router.post("/loginGoogle", async (req, res) => {
           name: user.name,
           phone: user.phone,
           active: user.active,
+          profileImg: user.profileImg,
+          country: user.country,
+          dateOfBirth: user.dateOfBirth,
         },
       });
     }
 
     let newUser = User.build({
-      name: `${userInfo.name}`,
-      email: `${userInfo.email}`,
-      country: userInfo.country,
+      name: `${userInfo.data.name}`,
+      email: `${userInfo.data.email}`,
+      country: "US",
       active: `${true}`,
       notificationToken: deviceToken,
+      dateOfBirth: Date.now(),
+      profileImg: userInfo.data.picture,
+      oauthSignIn: true,
     });
 
     newUser = await newUser.save();
@@ -284,6 +292,9 @@ router.post("/loginGoogle", async (req, res) => {
         phone: newUser.phone,
         active: newUser.active,
         balance: newUser.balance,
+        profileImg: newUser.profileImg,
+        country: newUser.country,
+        dateOfBirth: newUser.dataOfBirth,
       },
     });
   } catch (error) {
@@ -360,6 +371,7 @@ router.post("/register", async (req, res) => {
       notificationToken: deviceToken,
       country: country,
       dateOfBirth: dob,
+      oauthSignIn: false,
     });
 
     // Create salt and hash
@@ -384,7 +396,7 @@ router.post("/register", async (req, res) => {
         active: newUser.active,
         balance: newUser.balance,
         country: newUser.country,
-        dob: newUser.dataOfBirth,
+        dataOfBirth: newUser.dataOfBirth,
       },
     });
   } catch (error) {

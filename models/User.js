@@ -30,7 +30,7 @@ const User = db.define(
     },
     dateOfBirth: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
       // allowNull defaults to true
     },
     notificationToken: {
@@ -69,11 +69,15 @@ const User = db.define(
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
 
       // allowNull defaults to true
     },
-
+    oauthSingIn: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
     register_date: {
       type: DataTypes.DATE,
       defaultValue: Date.now,
