@@ -24,7 +24,7 @@
   "scripts": {
     "start": "node server.js",
     "server": "nodemon server.js",
-    "client": "npm start --prefix admin-panel",
+    "client": "npm start --prefix adminPanel",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "name": "reactadmin",
