@@ -5,8 +5,13 @@ import {
   TextField,
   DateField,
   ImageField,
+  required,
+  minLength,
+  maxLength,
 } from "react-admin";
 import { useRecordContext } from "react-admin";
+const validateLink = [required(), minLength(2), maxLength(15)];
+const validateTitle = [required(), minLength(2), maxLength(15)];
 
 export const OfferList = () => (
   <List>
@@ -18,6 +23,44 @@ export const OfferList = () => (
       <TextField source="link" />
     </Datagrid>
   </List>
+);
+
+export const UserEdit = () => (
+  <Edit>
+    <SimpleForm validate={validateUser}>
+      <TextInput source="id" />
+      <NumberInput source="active" />
+      <TextInput source="title" validate={validateTitle} />
+      <TextInput source="link" validate={validateLink} />
+      <ImageInput source="pictures" multiple={true} accept="image/png">
+        <ImageField source="src" title="profile image" />
+      </ImageInput>
+    </SimpleForm>
+  </Edit>
+);
+export const OfferCreate = () => (
+  <Create>
+    <SimpleForm validate={validateOffer}>
+      <TextInput source="id" />
+      <NumberInput source="active" />
+      <TextInput source="title" validate={validateTitle} />
+      <TextInput source="link" validate={validateLink} />
+
+      <ImageInput source="pictures" multiple={true} accept="image/png">
+        <ImageField source="src" title="profile image" />
+      </ImageInput>
+    </SimpleForm>
+  </Create>
+);
+export const OfferShow = () => (
+  <Show>
+    <SimpleShowLayout>
+      <OfferImageField source="icon" />
+      <TextField source="title" />
+
+      <TextField source="link" />
+    </SimpleShowLayout>
+  </Show>
 );
 
 export const OfferImageField = (props) => {
