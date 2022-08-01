@@ -6,7 +6,7 @@ const config = require("config");
 //const axios = require("axios");
 
 const auth = require("../../middleware/auth");
-
+const { parseQuery } = require("../../utility");
 const { Offer } = require("../../models");
 router.get("/getOffers", auth, async (req, res) => {
   const { offset } = req.query;
