@@ -7,7 +7,7 @@ import {
   DateField,
   ImageField,
 } from "react-admin";
-export const UserList = () => (
+export const AdminList = () => (
   <List>
     <Datagrid rowClick="edit">
       <TextField source="id" />

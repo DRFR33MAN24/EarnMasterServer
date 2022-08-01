@@ -24,7 +24,7 @@ import {
 } from "react-admin";
 import { CustomImageField } from "./CustomImageField";
 
-const validatePlayer = (values) => {
+const validateUser = (values) => {
   const errors = {};
   if (values.new_password !== values.repeat_password) {
     errors.password = "Passwords dosen't match";
@@ -38,7 +38,7 @@ const validateEmail = email();
 
 const validatePassword = [required(), minLength(8)];
 
-export const PlayerList = () => (
+export const UserList = () => (
   <List>
     <Datagrid rowClick="show">
       <TextField source="id" />
@@ -52,9 +52,9 @@ export const PlayerList = () => (
   </List>
 );
 
-export const PlayerEdit = () => (
+export const UserEdit = () => (
   <Edit>
-    <SimpleForm validate={validatePlayer}>
+    <SimpleForm validate={validateUser}>
       <TextInput source="id" />
       <NumberInput source="active" />
       <TextInput source="name" validate={validateName} />
@@ -68,9 +68,9 @@ export const PlayerEdit = () => (
     </SimpleForm>
   </Edit>
 );
-export const PlayerCreate = () => (
+export const UserCreate = () => (
   <Create>
-    <SimpleForm validate={validatePlayer}>
+    <SimpleForm validate={validateUser}>
       <TextInput source="id" />
       <NumberInput source="active" />
       <TextInput source="name" validate={validateName} />
@@ -84,7 +84,7 @@ export const PlayerCreate = () => (
     </SimpleForm>
   </Create>
 );
-export const PlayerShow = () => (
+export const UserShow = () => (
   <Show>
     <SimpleShowLayout>
       <CustomImageField source="profileImg" />

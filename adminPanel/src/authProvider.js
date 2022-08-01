@@ -1,6 +1,6 @@
 export default {
   login: ({ email, password }) => {
-    const request = new Request("http://localhost:5000/api/auth/", {
+    const request = new Request("http://localhost:5000/api/authAdmin/", {
       method: "POST",
       body: JSON.stringify({ email, password }),
       headers: new Headers({ "Content-Type": "application/json" }),

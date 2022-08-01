@@ -8,7 +8,7 @@ const auth = require("../../middleware/auth");
 
 // Player Model
 
-const { User, PaymentOrder, Offer } = require("../../models");
+const { User } = require("../../models");
 const { parseQuery, saveProfileImage } = require("../../utility");
 const db = require("../../database");
 const { paypalPayment } = require("./payments");
@@ -156,178 +156,178 @@ router.get("/transactions", auth, async (req, res) => {
   }
 });
 
-// router.get("/", auth, async (req, res) => {
-//   if (!req.query) {
-//     return res.json(JSON.stringify({ status: 400 }));
-//   }
-//   const parsedQuery = parseQuery(req.query);
-//   // console.log(parsedQuery);
-//   try {
-//     let player = await Player.findAll({
-//       where: parseQuery.filter,
-//       order: parsedQuery.order,
-//       offset: parseQuery.offset,
-//       limit: parseQuery.limit,
-//       raw: true,
-//       //plain: true,
-//     });
+router.get("/", auth, async (req, res) => {
+  if (!req.query) {
+    return res.json(JSON.stringify({ status: 400 }));
+  }
+  const parsedQuery = parseQuery(req.query);
+  // console.log(parsedQuery);
+  try {
+    let user = await User.findAll({
+      where: parseQuery.filter,
+      order: parsedQuery.order,
+      offset: parseQuery.offset,
+      limit: parseQuery.limit,
+      raw: true,
+      //plain: true,
+    });
 
-//     if (!player) {
-//       return res.json(JSON.stringify({ status: 400 }));
-//     }
-//     if (player.active === false) {
-//       return res
-//         .status(400)
-//         .json({ msg: "Please activate your account", status: "ERR" });
-//     }
+    if (!user) {
+      return res.json(JSON.stringify({ status: 400 }));
+    }
+    if (user.active === false) {
+      return res
+        .status(400)
+        .json({ msg: "Please activate your account", status: "ERR" });
+    }
 
-//     res.setHeader("X-Total-Count", player.length);
-//     res.setHeader("Content-Type", "application/json");
-//     res.end(JSON.stringify(player));
-//   } catch (error) {
-//     console.log(error);
-//     return res.json(JSON.stringify({ status: 500 }));
-//   }
-// });
+    res.setHeader("X-Total-Count", user.length);
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify(user));
+  } catch (error) {
+    console.log(error);
+    return res.json(JSON.stringify({ status: 500 }));
+  }
+});
 
-// router.get("/searchPlayers", auth, async (req, res) => {
-//   console.log("seraching for player");
-//   const { searchQuery } = req.query;
-//   if (!searchQuery) {
-//     return res.json([{ label: "NO Players ", id: 1 }]);
-//   }
-//   try {
-//     const players = await Player.findAll({
-//       where: {
-//         name: { [Sequelize.Op.like]: `%${searchQuery}%` },
-//       },
-//       limit: 10,
-//       raw: true,
-//     });
-//     // console.log(players);
-//     if (!players) {
-//       return res.json(JSON.stringify({ status: 400 }));
-//     }
-//     const result = players.map((player) => {
-//       return {
-//         label: player.name,
-//         id: player.id,
-//       };
-//     });
-//     // console.log(result);
-//     return res.json(result);
-//   } catch (error) {
-//     console.log(error);
-//     return res.json(JSON.stringify({ status: 500 }));
-//   }
-// });
+router.get("/searchUsers", auth, async (req, res) => {
+  console.log("seraching for user");
+  const { searchQuery } = req.query;
+  if (!searchQuery) {
+    return res.json([{ label: "NO Users ", id: 1 }]);
+  }
+  try {
+    const users = await User.findAll({
+      where: {
+        name: { [Sequelize.Op.like]: `%${searchQuery}%` },
+      },
+      limit: 10,
+      raw: true,
+    });
+    // console.log(players);
+    if (!users) {
+      return res.json(JSON.stringify({ status: 400 }));
+    }
+    const result = users.map((user) => {
+      return {
+        label: user.name,
+        id: user.id,
+      };
+    });
+    // console.log(result);
+    return res.json(result);
+  } catch (error) {
+    console.log(error);
+    return res.json(JSON.stringify({ status: 500 }));
+  }
+});
 
-// router.get("/:id", auth, async (req, res) => {
-//   console.log("getting a record");
-//   if (!req.params.id) {
-//     return res.json(JSON.stringify({ status: 400 }));
-//   }
+router.get("/:id", auth, async (req, res) => {
+  console.log("getting a record");
+  if (!req.params.id) {
+    return res.json(JSON.stringify({ status: 400 }));
+  }
 
-//   try {
-//     let player = await Player.findAll({
-//       where: {
-//         id: req.params.id,
-//       },
-//       plain: true,
-//     });
-//     //console.log("player", player);
+  try {
+    let user = await User.findAll({
+      where: {
+        id: req.params.id,
+      },
+      plain: true,
+    });
+    //console.log("player", player);
 
-//     if (!player) {
-//       return res.status(404).json({ msg: "Not Found" });
-//     }
-//     if (player.active === false) {
-//       return res
-//         .status(400)
-//         .json({ msg: "Please activate your account", status: "ERR" });
-//     }
+    if (!user) {
+      return res.status(404).json({ msg: "Not Found" });
+    }
+    if (user.active === false) {
+      return res
+        .status(400)
+        .json({ msg: "Please activate your account", status: "ERR" });
+    }
 
-//     res.json(player);
-//   } catch (error) {
-//     console.log(error);
-//     return res.json(JSON.stringify({ status: 500 }));
-//   }
+    res.json(user);
+  } catch (error) {
+    console.log(error);
+    return res.json(JSON.stringify({ status: 500 }));
+  }
 
-//   // User.findById(req.user.id)
-//   //   .select("-password")
-//   //   .then(user => res.json(user));
-// });
+  // User.findById(req.user.id)
+  //   .select("-password")
+  //   .then(user => res.json(user));
+});
 
-// router.put("/:id", auth, async (req, res) => {
-//   console.log("update route called");
-//   const { password, repeat_password, active, name, email, pictures } = req.body;
-//   if (!req.params.id) {
-//     return res.json(JSON.stringify({ status: 400 }));
-//   }
+router.put("/:id", auth, async (req, res) => {
+  console.log("update route called");
+  const { password, repeat_password, active, name, email, pictures } = req.body;
+  if (!req.params.id) {
+    return res.json(JSON.stringify({ status: 400 }));
+  }
 
-//   try {
-//     let player = await Player.findOne({
-//       where: { id: req.params.id },
-//       raw: true,
-//       plain: true,
-//     });
-//     //console.log(player);
-//     let imageHash = "";
-//     if (pictures) {
-//       imageHash = saveProfileImage(pictures, player.profileImg);
-//     } else {
-//       imageHash = player.profileImg;
-//     }
+  try {
+    let user = await User.findOne({
+      where: { id: req.params.id },
+      raw: true,
+      plain: true,
+    });
+    //console.log(player);
+    let imageHash = "";
+    if (pictures) {
+      imageHash = saveProfileImage(pictures, user.profileImg);
+    } else {
+      imageHash = user.profileImg;
+    }
 
-//     let salt = await bcryptjs.genSalt(10);
-//     let hash = await bcryptjs.hash(password, salt);
-//     await Player.update(
-//       {
-//         password: hash,
-//         name: name,
-//         active: active,
-//         email: email,
-//         profileImg: imageHash,
-//       },
-//       {
-//         where: { id: req.params.id },
-//       }
-//     );
-//     res.setHeader("Content-Type", "application/json");
-//     res.end(JSON.stringify(req.body));
-//   } catch (error) {
-//     console.log(error);
-//     return res.json(JSON.stringify({ status: 500 }));
-//   }
-// });
+    let salt = await bcryptjs.genSalt(10);
+    let hash = await bcryptjs.hash(password, salt);
+    await User.update(
+      {
+        password: hash,
+        name: name,
+        active: active,
+        email: email,
+        profileImg: imageHash,
+      },
+      {
+        where: { id: req.params.id },
+      }
+    );
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify(req.body));
+  } catch (error) {
+    console.log(error);
+    return res.json(JSON.stringify({ status: 500 }));
+  }
+});
 
-// router.post("/", auth, async (req, res) => {
-//   console.log("create route called");
-//   const { password, repeat_password, active, name, email, pictures } = req.body;
-//   //Validate input here
-//   if (!name || !password || !email) {
-//     return res.json(JSON.stringify({ status: 400 }));
-//   }
+router.post("/", auth, async (req, res) => {
+  console.log("create route called");
+  const { password, repeat_password, active, name, email, pictures } = req.body;
+  //Validate input here
+  if (!name || !password || !email) {
+    return res.json(JSON.stringify({ status: 400 }));
+  }
 
-//   let imageHash = "";
-//   if (pictures !== undefined) {
-//     imageHash = saveProfileImage(pictures, "");
-//   }
-//   try {
-//     let salt = await bcryptjs.genSalt(10);
-//     let hash = await bcryptjs.hash(password, salt);
-//     await Player.create({
-//       password: hash,
-//       name: name,
-//       active: active,
-//       email: email,
-//       profileImg: imageHash,
-//     });
-//     res.setHeader("Content-Type", "application/json");
-//     res.end(JSON.stringify(req.body));
-//   } catch (error) {
-//     console.log(error);
-//     return res.json(JSON.stringify({ status: 500 }));
-//   }
-// });
+  let imageHash = "";
+  if (pictures !== undefined) {
+    imageHash = saveProfileImage(pictures, "");
+  }
+  try {
+    let salt = await bcryptjs.genSalt(10);
+    let hash = await bcryptjs.hash(password, salt);
+    await User.create({
+      password: hash,
+      name: name,
+      active: active,
+      email: email,
+      profileImg: imageHash,
+    });
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify(req.body));
+  } catch (error) {
+    console.log(error);
+    return res.json(JSON.stringify({ status: 500 }));
+  }
+});
 
 module.exports = router;

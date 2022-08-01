@@ -7,8 +7,8 @@ import {
   EditGuesser,
   ShowGuesser,
 } from "react-admin";
-import { UserList } from "./UserList";
-import { PlayerList, PlayerEdit, PlayerShow, PlayerCreate } from "./PlayerList";
+import { AdminList } from "./AdminList";
+import { UserCreate, UserEdit, UserList, UserShow } from "./UserUI";
 import { GameList, GameEdit, GameShow, GameCreate } from "./GameList";
 import authProvider from "./authProvider";
 import addUploadFeature from "./addUploadFeature";
@@ -26,20 +26,21 @@ const App = () => (
     dataProvider={addUploadFeature}
     authProvider={authProvider}
   >
-    <Resource name="users" list={UserList} />
-    <Resource
+    <Resource name="admins" list={AdminList} />
+
+    {/* <Resource
       name="games"
       list={GameList}
       edit={GameEdit}
       show={GameShow}
       create={GameCreate}
-    />
+    /> */}
     <Resource
-      name="players"
-      list={PlayerList}
-      edit={PlayerEdit}
-      show={PlayerShow}
-      create={PlayerCreate}
+      name="users"
+      list={UserList}
+      edit={UserEdit}
+      show={UserShow}
+      create={UserCreate}
     />
   </Admin>
 );

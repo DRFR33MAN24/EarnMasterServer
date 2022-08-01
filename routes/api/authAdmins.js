@@ -8,8 +8,7 @@ const multer = require("multer");
 
 //const axios = require("axios");
 
-// User Model
-const { User } = require("../../models");
+const { Admin } = require("../../models");
 const fs = require("fs");
 const path = require("path");
 const glob = require("glob");
@@ -47,7 +46,7 @@ const upload = multer({ storage: storage });
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
 
-  console.log(req.body);
+  // console.log(req.body);
 
   // Verify URL
   // const query = stringify({
@@ -69,7 +68,7 @@ router.post("/", async (req, res) => {
       .json({ msg: "Please enter all fields", status: "ERR" });
   }
 
-  let user = await User.findOne({ where: { email: email } }, { plain: true });
+  let user = await Admin.findOne({ where: { email: email } }, { plain: true });
   if (!user) {
     return res
       .status(400)

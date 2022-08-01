@@ -8,14 +8,14 @@ const jwt = require("jsonwebtoken");
 
 const auth = require("../../middleware/auth");
 // User Model
-const User = require("../../models");
+const { Admin } = require("../../models");
 const { parseQuery } = require("../../utility");
 
 // @route POST api/users
 // @desc Register New User
 // @acces Public
 router.post("/register", async (req, res) => {
-  console.log(req.body);
+  //console.log(req.body);
   const { name, email, password, active } = req.body;
   // Verify URL
   // const query = stringify({
@@ -36,7 +36,7 @@ router.post("/register", async (req, res) => {
   }
 
   // Check for exitsting user
-  let user = await User.findOne(
+  let user = await Admin.findOne(
     { where: { email: `${email}` } },
     { plain: true }
   );
@@ -49,9 +49,9 @@ router.post("/register", async (req, res) => {
   //   email,
   //   password
   // });
-  const newUser = User.build({
+  const newUser = Admin.build({
     name: `${name}`,
-    phone: `${email}`,
+    email: `${email}`,
     password: `${password}`,
     active: `${active}`,
   });
@@ -76,7 +76,7 @@ router.post("/register", async (req, res) => {
               user: {
                 id: user.id,
                 name: user.name,
-                phone: user.email,
+                email: user.email,
                 active: user.active,
               },
             });
@@ -91,7 +91,7 @@ router.get("/", auth, async (req, res) => {
   //console.log("Get Users Route", req.query);
   const parsedQuery = parseQuery(req.query);
   // console.log(parsedQuery);
-  let user = await User.findAll({
+  let admin = await Admin.findAll({
     where: parseQuery.filter,
     order: parsedQuery.order,
     offset: parseQuery.offset,
@@ -100,15 +100,15 @@ router.get("/", auth, async (req, res) => {
     //plain: true,
   });
 
-  if (user.active === false) {
+  if (admin.active === false) {
     return res
       .status(400)
       .json({ msg: "Please activate your account", status: "ERR" });
   }
   //console.log(user);
-  res.setHeader("X-Total-Count", user.length);
+  res.setHeader("X-Total-Count", admin.length);
   res.setHeader("Content-Type", "application/json");
-  res.end(JSON.stringify(user));
+  res.end(JSON.stringify(admin));
 
   // User.findById(req.user.id)
   //   .select("-password")
@@ -117,20 +117,20 @@ router.get("/", auth, async (req, res) => {
 
 router.get("/:id", auth, async (req, res) => {
   //console.log("LoadUser Route");
-  let user = await User.findAll({
+  let admin = await Admin.findAll({
     where: {
       id: req.params.id,
     },
     plain: true,
   });
 
-  if (user.active === false) {
+  if (admin.active === false) {
     return res
       .status(400)
       .json({ msg: "Please activate your account", status: "ERR" });
   }
 
-  res.json(user);
+  res.json(admin);
 
   // User.findById(req.user.id)
   //   .select("-password")
