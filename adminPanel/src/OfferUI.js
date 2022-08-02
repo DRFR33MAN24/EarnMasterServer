@@ -21,13 +21,14 @@ import {
   required,
   maxLength,
   email,
+  SearchInput,
 } from "react-admin";
 import { useRecordContext } from "react-admin";
 const validateLink = [required(), minLength(2), maxLength(15)];
 const validateTitle = [required(), minLength(2), maxLength(15)];
-
+const OfferFilters = [<SearchInput source="q" alwaysOn />];
 export const OfferList = () => (
-  <List>
+  <List filters={OfferFilters}>
     <Datagrid rowClick="edit">
       <TextField source="id" />
       <OfferImageField source="icon" />
