@@ -23,24 +23,22 @@ router.get("/", auth, async (req, res) => {
     return res.json(JSON.stringify({ status: 400 }));
   }
   const parsedQuery = parseQuery(req.query);
-  // console.log(parsedQuery);
+  //console.log(parsedQuery);
   try {
-    let offer = await Offer.findAll({
-      where: parseQuery.filter,
+    let offer = await Offer.findAndCountAll({
+      where: parsedQuery.filter,
       order: parsedQuery.order,
-      offset: parseQuery.offset,
-      limit: parseQuery.limit,
-      raw: true,
-      //plain: true,
+      offset: parsedQuery.offset,
+      limit: parsedQuery.limit,
     });
 
     if (!offer) {
       return res.json(JSON.stringify({ status: 400 }));
     }
 
-    res.setHeader("X-Total-Count", offer.length);
+    res.setHeader("Content-Range", offer.count);
     res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify(offer));
+    res.end(JSON.stringify(offer.rows));
   } catch (error) {
     console.log(error);
     return res.json(JSON.stringify({ status: 500 }));

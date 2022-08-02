@@ -17,7 +17,9 @@ import { stringify } from "query-string";
 export const apiUrl = "http://localhost:5000/api";
 export const httpClient = (url, options = {}) => {
   if (!options.headers) {
-    options.headers = new Headers({ Accept: "application/json" });
+    options.headers = new Headers({
+      Accept: "application/json",
+    });
   }
   const token = localStorage.getItem("token");
   options.headers.set("x-auth-token", token);
@@ -27,7 +29,7 @@ export const httpClient = (url, options = {}) => {
 
 export default {
   getList: (resource, params) => {
-    console.log("getList called", resource);
+    //console.log("getList called", params);
     const { page, perPage } = params.pagination;
     const { field, order } = params.sort;
     const query = {
@@ -39,7 +41,7 @@ export default {
 
     return httpClient(url).then(({ headers, json }) => ({
       data: json,
-      total: parseInt(headers.get("X-Total-Count"), 10),
+      total: console.log(headers.get("content-range")),
     }));
   },
 

@@ -1,13 +1,26 @@
 import {
   List,
+  Edit,
+  Create,
   Datagrid,
   NumberField,
   TextField,
+  EmailField,
   DateField,
+  SimpleForm,
+  TextInput,
+  NumberInput,
+  DateInput,
+  Show,
+  SimpleShowLayout,
+  RichTextField,
+  EditButton,
   ImageField,
-  required,
+  ImageInput,
   minLength,
+  required,
   maxLength,
+  email,
 } from "react-admin";
 import { useRecordContext } from "react-admin";
 const validateLink = [required(), minLength(2), maxLength(15)];
@@ -27,7 +40,7 @@ export const OfferList = () => (
 
 export const UserEdit = () => (
   <Edit>
-    <SimpleForm validate={validateUser}>
+    <SimpleForm>
       <TextInput source="id" />
       <NumberInput source="active" />
       <TextInput source="title" validate={validateTitle} />
@@ -40,7 +53,7 @@ export const UserEdit = () => (
 );
 export const OfferCreate = () => (
   <Create>
-    <SimpleForm validate={validateOffer}>
+    <SimpleForm>
       <TextInput source="id" />
       <NumberInput source="active" />
       <TextInput source="title" validate={validateTitle} />
