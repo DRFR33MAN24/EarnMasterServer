@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
+const { Sequelize } = require("../../database");
 const config = require("config");
 
 //const axios = require("axios");
@@ -23,10 +23,19 @@ router.get("/", auth, async (req, res) => {
     return res.json(JSON.stringify({ status: 400 }));
   }
   const parsedQuery = parseQuery(req.query);
-  //console.log(parsedQuery);
+  console.log(parsedQuery);
   try {
     let offer = await Offer.findAndCountAll({
-      where: parsedQuery.filter,
+      where: {
+        title: parsedQuery.q
+          ? {
+              [Sequelize.Op.and]: [
+                { [Sequelize.Op.like]: "%" + parsedQuery.q + "%" },
+                { [Sequelize.Op.like]: "%" + parsedQuery.q + "%" },
+              ],
+            }
+          : { [Sequelize.Op.ne]: "" },
+      },
       order: parsedQuery.order,
       offset: parsedQuery.offset,
       limit: parsedQuery.limit,
@@ -37,7 +46,7 @@ router.get("/", auth, async (req, res) => {
     }
 
     res.setHeader("X-Total-Count", offer.count);
-    res.setHeader('Access-Control-Expose-Headers', 'X-Total-Count');
+    res.setHeader("Access-Control-Expose-Headers", "X-Total-Count");
     res.setHeader("Content-Type", "application/json");
     res.end(JSON.stringify(offer.rows));
   } catch (error) {
