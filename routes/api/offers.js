@@ -36,7 +36,8 @@ router.get("/", auth, async (req, res) => {
       return res.json(JSON.stringify({ status: 400 }));
     }
 
-    res.setHeader("Content-Range", offer.count);
+    res.setHeader("X-Total-Count", offer.count);
+    res.setHeader('Access-Control-Expose-Headers', 'X-Total-Count');
     res.setHeader("Content-Type", "application/json");
     res.end(JSON.stringify(offer.rows));
   } catch (error) {

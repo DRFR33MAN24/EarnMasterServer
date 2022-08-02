@@ -41,7 +41,7 @@ export default {
 
     return httpClient(url).then(({ headers, json }) => ({
       data: json,
-      total: console.log(headers.get("content-range")),
+      total: headers.get("X-Total-Count"),
     }));
   },
 
