@@ -38,7 +38,7 @@ export const OfferList = () => (
   </List>
 );
 
-export const UserEdit = () => (
+export const OfferEdit = () => (
   <Edit>
     <SimpleForm>
       <TextInput source="id" />

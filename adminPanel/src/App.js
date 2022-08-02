@@ -8,7 +8,7 @@ import {
   ShowGuesser,
 } from "react-admin";
 import { AdminList } from "./AdminList";
-import { OfferList } from "./OfferUI";
+import { OfferList, OfferCreate, OfferShow, OfferEdit } from "./OfferUI";
 import { UserCreate, UserEdit, UserList, UserShow } from "./UserUI";
 import { GameList, GameEdit, GameShow, GameCreate } from "./GameList";
 import authProvider from "./authProvider";
@@ -43,7 +43,13 @@ const App = () => (
       show={UserShow}
       create={UserCreate}
     />
-    <Resource name="offers" list={OfferList} />
+    <Resource
+      name="offers"
+      list={OfferList}
+      edit={OfferEdit}
+      show={OfferShow}
+      create={OfferCreate}
+    />
   </Admin>
 );
 
