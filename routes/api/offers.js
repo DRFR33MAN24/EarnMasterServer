@@ -28,12 +28,7 @@ router.get("/", auth, async (req, res) => {
     let offer = await Offer.findAndCountAll({
       where: {
         title: parsedQuery.q
-          ? {
-              [Sequelize.Op.and]: [
-                { [Sequelize.Op.like]: "%" + parsedQuery.q + "%" },
-                { [Sequelize.Op.like]: "%" + parsedQuery.q + "%" },
-              ],
-            }
+          ? { [Sequelize.Op.like]: "%" + parsedQuery.q + "%" }
           : { [Sequelize.Op.ne]: "" },
       },
       order: parsedQuery.order,
