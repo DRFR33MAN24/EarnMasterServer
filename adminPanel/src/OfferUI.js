@@ -41,6 +41,7 @@ export const OfferList = () => (
       <OfferImageField source="icon" />
       <NumberField source="active" />
       <TextField source="title" />
+      <TextField source="amount" />
       <TextField source="link" />
     </Datagrid>
   </List>
