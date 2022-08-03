@@ -23,10 +23,17 @@ import {
   email,
   SearchInput,
 } from "react-admin";
+import { Chip } from "@mui/material";
 import { useRecordContext } from "react-admin";
+export const QuickFilter = ({ label }) => {
+  return <Chip sx={{ marginBottom: 1 }} label={label} />;
+};
 const validateLink = [required(), minLength(2), maxLength(15)];
 const validateTitle = [required(), minLength(2), maxLength(15)];
-const OfferFilters = [<SearchInput source="q" alwaysOn />];
+const OfferFilters = [
+  <SearchInput source="q" alwaysOn />,
+  <QuickFilter source="amount" label="High paying" defaultValue={150} />,
+];
 export const OfferList = () => (
   <List filters={OfferFilters}>
     <Datagrid rowClick="edit">
